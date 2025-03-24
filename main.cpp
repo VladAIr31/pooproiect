@@ -33,7 +33,7 @@ class card {
     std::string type;
     std::string use;
 public:
-    card(std::string type, std::string use) :
+    card(const std::string &type,  const std::string &use) :
     type(type), use(use) {}
     friend std::ostream &operator<<(std::ostream &os, const card &c) {
         os << c.type<<' '<<c.use;
@@ -73,14 +73,14 @@ class place {
     int sell_price;
     std::vector<hotel> hotels;
 public:
-    place( const std::string name, int price):
+    place( const std::string &name, int price):
     name(name),
     price(price), sell_price((price*2)/5),
     hotels()
     {}
     friend std::ostream &operator<<(std::ostream &os, const place &p) {
         os<<p.name<<' '<<p.price<<' '<<p.sell_price<<' ';
-        for (auto &h : p.hotels) {
+        for (auto const &h : p.hotels) {
             os<<h<<' ';
         }
         return os;
@@ -100,9 +100,10 @@ public:
        : name(name), p(p), buget(buget), cards() {}
     friend std::ostream &operator<<(std::ostream &os, const player &p) {
         os<<p.name<<' '<<p.buget<<' '<<p.p;
-        for (auto &card : p.cards) {
+        for (auto const  &card : p.cards) {
             os<<' '<<card;
         }
+
         return os;
     }
 };
