@@ -5,32 +5,14 @@
 
 #include <SFML/Graphics.hpp>
 
-#include <Helper.h>
-
-//////////////////////////////////////////////////////////////////////
-/// NOTE: this include is needed for environment-specific fixes     //
-/// You can remove this include and the call from main              //
-/// if you have tested on all environments, and it works without it //
-#include "env_fixes.h"                                              //
-//////////////////////////////////////////////////////////////////////
 
 
-//////////////////////////////////////////////////////////////////////
-/// This class is used to test that the memory leak checks work as expected even when using a GUI
-class SomeClass {
-public:
-    explicit SomeClass(int) {}
-};
 
-SomeClass *getC() {
-    return new SomeClass{2};
-}
-//////////////////////////////////////////////////////////////////////
 
 class  pawn {
     std::string color;
     std::pair<int, int> position;
-    public:
+public:
     pawn(std::string color, std::pair<int, int> position) :
     color(color), position(position) {}
 
@@ -42,21 +24,32 @@ class  pawn {
         return *this;
     }
     ~pawn() {}
-
+    friend std::ostream &operator<<(std::ostream &os, const pawn &p) {
+        os << p.color<<' '<<p.position.first<<' '<<p.position.second;
+        return os;
+    }
 };
-class cards {
+class card {
     std::string type;
     std::string use;
 public:
-    cards(std::string type, std::string use) :
+    card(std::string type, std::string use) :
     type(type), use(use) {}
+    friend std::ostream &operator<<(std::ostream &os, const card &c) {
+        os << c.type<<' '<<c.use;
+        return os;
+    }
 };
 
 
 class hotel {
     int price=500;
     int sell_price=200;
-
+public:
+    friend std::ostream &operator<<(std::ostream &os, const hotel &h) {
+        os << h.price<<' '<<h.sell_price;
+        return os;
+    }
 };
 
 class chalet {
@@ -68,18 +61,30 @@ class chalet {
 public:
     chalet(const std::string &name, int price)
         : name(name), price(price), sell_price(price*3/10) {}
-
+    friend std::ostream &operator<<(std::ostream &os, const chalet &c) {
+        os<<c.name<<' '<<c.price<<' '<<c.sell_price;
+        return os;
+    }
 
 };
 class place {
     std::string name;
     int price;
     int sell_price;
-    hotel Hotels[5];
+    std::vector<hotel> hotels;
 public:
     place( const std::string name, int price):
     name(name),
-    price(price), sell_price((price*2)/5) {}
+    price(price), sell_price((price*2)/5),
+    hotels()
+    {}
+    friend std::ostream &operator<<(std::ostream &os, const place &p) {
+        os<<p.name<<' '<<p.price<<' '<<p.sell_price<<' ';
+        for (auto &h : p.hotels) {
+            os<<h<<' ';
+        }
+        return os;
+    }
 
 
 
@@ -89,11 +94,17 @@ class player {
     std::string name;
     pawn p;
     int buget;
-    std::vector<cards> cards;
+    std::vector<card> cards;
 public:
     player(const std::string& name, const pawn& p, int buget)
        : name(name), p(p), buget(buget), cards() {}
-
+    friend std::ostream &operator<<(std::ostream &os, const player &p) {
+        os<<p.name<<' '<<p.buget<<' '<<p.p;
+        for (auto &card : p.cards) {
+            os<<' '<<card;
+        }
+        return os;
+    }
 };
 
 
@@ -101,101 +112,18 @@ public:
 int main() {
     pawn A("green",{1,2});
     player one("Marcel",A,5000);
+    chalet sus("Susai",500);
+    card Power("Special","Now");
+    std::cout<<A<<' '<<one<<' '<<sus<<' '<<Power;
 
 
 
 
 
 
-    ////////////////////////////////////////////////////////////////////////
-    /// NOTE: this function call is needed for environment-specific fixes //
-    init_threads();                                                       //
-    ////////////////////////////////////////////////////////////////////////
-    ///
 
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-    ///                Exemplu de utilizare cod generat                     ///
-    ///////////////////////////////////////////////////////////////////////////
-    Helper helper;
-    helper.help();
-    ///////////////////////////////////////////////////////////////////////////
 
-    SomeClass *c = getC();
-    std::cout << c << "\n";
-    delete c;
 
-    sf::RenderWindow window;
-    ///////////////////////////////////////////////////////////////////////////
-    /// NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:31
-    window.create(sf::VideoMode({800, 700}), "My Window", sf::Style::Default);
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    ///////////////////////////////////////////////////////////////////////////
-    /// NOTE: mandatory use one of vsync or FPS limit (not both)            ///
-    /// This is needed so we do not burn the GPU                            ///
-    window.setVerticalSyncEnabled(true);                                    ///
-    /// window.setFramerateLimit(60);                                       ///
-    ///////////////////////////////////////////////////////////////////////////
-
-    while(window.isOpen()) {
-        bool shouldExit = false;
-        sf::Event e{};
-        while(window.pollEvent(e)) {
-            switch(e.type) {
-            case sf::Event::Closed:
-                window.close();
-                break;
-            case sf::Event::Resized:
-                std::cout << "New width: " << window.getSize().x << '\n'
-                          << "New height: " << window.getSize().y << '\n';
-                break;
-            case sf::Event::KeyPressed:
-                std::cout << "Received key " << (e.key.code == sf::Keyboard::X ? "X" : "(other)") << "\n";
-                if(e.key.code == sf::Keyboard::Escape)
-                    shouldExit = true;
-                break;
-            default:
-                break;
-            }
-        }
-        if(shouldExit) {
-            window.close();
-            break;
-        }
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(300ms);
-
-        window.clear();
-        window.display();
-    }
     return 0;
 }
