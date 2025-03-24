@@ -27,17 +27,92 @@ SomeClass *getC() {
 }
 //////////////////////////////////////////////////////////////////////
 
+class  pawn {
+    std::string color;
+    std::pair<int, int> position;
+    public:
+    pawn(std::string color, std::pair<int, int> position) :
+    color(color), position(position) {}
+
+    pawn(const pawn &p): color(p.color), position(p.position) {}
+
+    pawn& operator=(const pawn &p) {
+        color = p.color;
+        position = p.position;
+        return *this;
+    }
+    ~pawn() {}
+
+};
+class cards {
+    std::string type;
+    std::string use;
+public:
+    cards(std::string type, std::string use) :
+    type(type), use(use) {}
+};
+
+
+class hotel {
+    int price=500;
+    int sell_price=200;
+
+};
+
+class chalet {
+    std::string name;
+    int price;
+    int sell_price;
+
+
+public:
+    chalet(const std::string &name, int price)
+        : name(name), price(price), sell_price(price*3/10) {}
+
+
+};
+class place {
+    std::string name;
+    int price;
+    int sell_price;
+    hotel Hotels[5];
+public:
+    place( const std::string name, int price):
+    name(name),
+    price(price), sell_price((price*2)/5) {}
+
+
+
+};
+
+class player {
+    std::string name;
+    pawn p;
+    int buget;
+    std::vector<cards> cards;
+public:
+    player(const std::string& name, const pawn& p, int buget)
+       : name(name), p(p), buget(buget), cards() {}
+
+};
+
+
 
 int main() {
+    pawn A("green",{1,2});
+    player one("Marcel",A,5000);
+
+
+
+
+
+
     ////////////////////////////////////////////////////////////////////////
     /// NOTE: this function call is needed for environment-specific fixes //
     init_threads();                                                       //
     ////////////////////////////////////////////////////////////////////////
     ///
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
+
     /////////////////////////////////////////////////////////////////////////
     /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
     /// dați exemple de date de intrare folosind fișierul tastatura.txt
@@ -58,17 +133,7 @@ int main() {
     /// program care merg (și să le evitați pe cele care nu merg).
     ///
     /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
-    }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
     /// alt fișier propriu cu ce alt nume doriți.
