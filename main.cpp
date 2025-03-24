@@ -121,10 +121,10 @@ public:
         if (c.get_type()!="Now")
         cards.push_back(c);
     }
-    void add_place (const  place& p) {
-        int price=p.get_price();
+    void add_place (const  place& pl) {
+        int price=pl.get_price();
         if (buget>=price)
-            ownership.push_back(p), buget=buget-price;
+            ownership.push_back(pl), buget=buget-price;
         else std::cout << "You are broke" << std::endl;
 
 
@@ -132,10 +132,10 @@ public:
     void usecard ( const card & c) {
         cards.erase(find(cards.begin(), cards.end(), c));
     }
-    void sell_place (const place& p) {
-        int price=p.get_sell_price();
+    void sell_place (const place& pl) {
+        int price=pl.get_sell_price();
         buget+=price;
-        ownership.erase(find(ownership.begin(), ownership.end(), p));
+        ownership.erase(find(ownership.begin(), ownership.end(), pl));
 
     }
 };
