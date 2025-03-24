@@ -42,7 +42,7 @@ public:
     bool operator==(const card &) const {
         return true;
     }
-    std::string get_type() const  { return type; }
+    std::string get_type() const&  { return type; }
 };
 
 
@@ -108,8 +108,8 @@ public:
         for (auto const  &card : p.cards) {
             os<<' '<<card;
         }
-            for (auto const  &ownership : p.ownership) {
-                os<<' '<<ownership;
+            for (auto const  &own : p.ownership) {
+                os<<' '<<own;
             }
 
 
