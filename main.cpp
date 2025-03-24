@@ -103,12 +103,12 @@ class player {
 public:
     player(const std::string& name, const pawn& p, int buget)
        : name(name), p(p), buget(buget), cards(), ownership() {}
-    friend std::ostream &operator<<(std::ostream &os, const player &p) {
-        os<<p.name<<' '<<p.buget<<' '<<p.p;
-        for (auto const  &card : p.cards) {
+    friend std::ostream &operator<<(std::ostream &os, const player &pa) {
+        os<<pa.name<<' '<<pa.buget<<' '<<pa.p;
+        for (auto const  &card : pa.cards) {
             os<<' '<<card;
         }
-            for (auto const  &own : p.ownership) {
+            for (auto const  &own : pa.ownership) {
                 os<<' '<<own;
             }
 
