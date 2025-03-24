@@ -39,6 +39,11 @@ public:
         os << c.type<<' '<<c.use;
         return os;
     }
+    bool operator==(const card &) const {
+        return true;
+    }
+    std::string get_type() const  { return type; }
+    std::string get_use() const { return use; }
 };
 
 
@@ -71,22 +76,22 @@ class place {
     std::string name;
     int price;
     int sell_price;
-    std::vector<hotel> hotels;
+    int nr_hotels;
 public:
     place( const std::string &name, int price):
     name(name),
     price(price), sell_price((price*2)/5),
-    hotels()
+    nr_hotels()
     {}
     friend std::ostream &operator<<(std::ostream &os, const place &p) {
-        os<<p.name<<' '<<p.price<<' '<<p.sell_price<<' ';
-        for (auto const &h : p.hotels) {
-            os<<h<<' ';
-        }
+        os<<p.name<<' '<<p.price<<' '<<p.sell_price<<' '<<p.nr_hotels;
         return os;
     }
-
-
+    int get_price()  const{ return price; }
+    int get_sell_price()  const{ return sell_price; }
+    bool operator==(const place &) const {
+        return true;
+    }
 
 };
 
@@ -95,6 +100,7 @@ class player {
     pawn p;
     int buget;
     std::vector<card> cards;
+    std::vector<place> ownership;
 public:
     player(const std::string& name, const pawn& p, int buget)
        : name(name), p(p), buget(buget), cards() {}
@@ -103,8 +109,35 @@ public:
         for (auto const  &card : p.cards) {
             os<<' '<<card;
         }
+            for (auto const  &ownership : p.ownership) {
+                os<<' '<<ownership;
+            }
+
+
+
 
         return os;
+    }
+    void add_card(const card& c) {
+        if (c.get_type()!="Now")
+        cards.push_back(c);
+    }
+    void add_place (const  place& p) {
+        int price=p.get_price();
+        if (buget>=price)
+            ownership.push_back(p), buget=buget-price;
+        else std::cout << "You are broke" << std::endl;
+
+
+    }
+    void usecard ( const card & c) {
+        cards.erase(find(cards.begin(), cards.end(), c));
+    }
+    void sell_place (const place& p) {
+        int price=p.get_sell_price();
+        buget+=price;
+        ownership.erase(find(ownership.begin(), ownership.end(), p));
+
     }
 };
 
@@ -115,7 +148,15 @@ int main() {
     player one("Marcel",A,5000);
     chalet sus("Susai",500);
     card Power("Special","Now");
-    std::cout<<A<<' '<<one<<' '<<sus<<' '<<Power;
+    place Su("Suceava",3000);
+    std::cout<<A<<'\n'<<one<<'\n'<<sus<<'\n'<<Power<<'\n'<<Su<<'\n';
+    one.add_card(Power);
+    one.add_place(Su);
+    std::cout<<one<<'\n';
+    one.usecard(Power);
+    std::cout<<one<<'\n';
+    one.sell_place(Su);
+    std::cout<<one<<'\n';
 
 
 
