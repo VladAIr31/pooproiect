@@ -43,7 +43,6 @@ public:
         return true;
     }
     std::string get_type() const  { return type; }
-    std::string get_use() const { return use; }
 };
 
 
@@ -103,7 +102,7 @@ class player {
     std::vector<place> ownership;
 public:
     player(const std::string& name, const pawn& p, int buget)
-       : name(name), p(p), buget(buget), cards() {}
+       : name(name), p(p), buget(buget), cards(), ownership() {}
     friend std::ostream &operator<<(std::ostream &os, const player &p) {
         os<<p.name<<' '<<p.buget<<' '<<p.p;
         for (auto const  &card : p.cards) {
@@ -161,6 +160,6 @@ int main() {
 
 
 
-    
+
     return 0;
 }
