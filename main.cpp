@@ -42,7 +42,7 @@ public:
     bool operator==(const card &) const {
         return true;
     }
-    std::string& get_type() const  { return type; }
+    std::string& get_type() const  { return *type; }
 };
 
 
