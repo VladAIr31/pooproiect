@@ -18,7 +18,7 @@ public:
         os << "Place: " << name << ' ' << price << ' ' << sell_price << ' ' << nr_hotels;
     }
 
-    int get_nr_hotels() const { return nr_hotels; }
+    //int get_nr_hotels() const { return nr_hotels; }
 
     bool operator==(const place &) const {
         return true;

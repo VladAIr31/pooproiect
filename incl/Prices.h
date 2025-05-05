@@ -16,12 +16,10 @@ public:
     virtual int get_price() const { return price; }
     virtual int get_sell_price() const { return sell_price; }
 
-    // Metodă virtuală pentru afișare
     virtual void print(std::ostream &os) const = 0;
 
     virtual ~prices() = default;
 
-    // Operator << virtual via metoda `print`
     friend std::ostream &operator<<(std::ostream &os, const prices &p) {
         p.print(os);
         return os;

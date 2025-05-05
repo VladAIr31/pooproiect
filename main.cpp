@@ -5,7 +5,7 @@
 #include <cmath>    // For std::abs, std::max, std::min
 #include <algorithm> // For std::max, std::min
 
-// Include your game logic headers
+
 #include "incl/Pawn.h"
 #include "incl/Card.h"
 #include "incl/Chalet.h"
@@ -13,9 +13,9 @@
 #include "incl/Places.h"
 #include "incl/player.h"
 
-// Include the header files for configuration and class declaration
-#include "incl/boardconf.h" // Provides constants
-#include "incl/board.h"    // Provides GameBoard class declaration
+
+#include "incl/boardconf.h"
+#include "incl/board.h"
 
 // --- GameBoard Class Implementation ---
 // Define the methods declared in GameBoard.hpp here
@@ -266,11 +266,6 @@ int main() {
             }
             // Add other event handling here
         }
-
-        // --- Game Logic Update ---
-        // (Add your game logic updates here)
-
-        // --- Drawing ---
         window.clear(sf::Color(200, 200, 200));
         gameBoard.draw(window); // Use the draw method defined above
         // Draw other elements (pawns, UI) here
