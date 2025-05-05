@@ -6,7 +6,7 @@
 #define MOTEL_H
 #include <iostream>
 #include <string>
-#include "Prices.h" // Include clasa de bază
+#include "Prices.h"
 
 class player;
 
