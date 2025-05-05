@@ -13,7 +13,6 @@
 #include "incl/Places.h"
 #include "incl/player.h"
 
-// Include the header files for configuration and class declaration
 #include "incl/board.h" // Provides constants
   // Provides GameBoard class declaration
 
