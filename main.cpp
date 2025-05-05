@@ -5,10 +5,10 @@
 #include <cmath>    // For std::abs, std::max, std::min
 #include <algorithm> // For std::max, std::min
 #include "incl/player.h"
-#include "incl/chalet.h"
+#include "incl/Chalet.h"
 #include "incl/board.h"
 #include "incl/boardconf.h"
-#include "incl/prices.h"
+#include "incl/Prices.h"
 #include "incl/exception.h"
 
 int main() {

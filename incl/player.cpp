@@ -73,7 +73,7 @@ void player::add_property(std::unique_ptr<prices> prop) {
 }
 
 std::unique_ptr<prices> player::sell_property(int index) {
-    if (index < 0 || index >= ownership.size() || !ownership[index]) {
+    if (index < 0 || index >= static_cast<int>(ownership.size()) || !ownership[index]) {
         std::cerr << "Index invalid (" << index << ") sau proprietate inexistenta pentru vanzare." << std::endl;
         return nullptr;
     }
