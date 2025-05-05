@@ -43,6 +43,7 @@ public:
     std::unique_ptr<prices> sell_property(int index);
 
     int countOwnedChalets() const;
+    int countOwnnedMotels() const;
 
 
     // Metode pentru carduri

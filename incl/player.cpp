@@ -6,6 +6,7 @@
 
 #include "exception.h"
 #include "Chalet.h"
+#include "motel.h"
 
 int player::activePlayers = 0;
 
@@ -100,6 +101,13 @@ int player::countOwnedChalets() const {
             return p && dynamic_cast<chalet*>(p.get()) != nullptr;
         });
 }
+int player::countOwnnedMotels() const {
+    return std::count_if(ownership.begin(), ownership.end(),
+        [](const std::unique_ptr<prices>& p) {
+            return p && dynamic_cast<motel*>(p.get()) != nullptr;
+        });
+}
+
 
 
 void player::add_card(const card& c) {
