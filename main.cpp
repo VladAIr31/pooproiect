@@ -13,9 +13,12 @@
 #include "incl/Places.h"
 #include "incl/player.h"
 
+// Include the header files for configuration and class declaration
 #include "incl/board.h" // Provides constants
+  // Provides GameBoard class declaration
 
 // --- GameBoard Class Implementation ---
+// Define the methods declared in GameBoard.hpp here
 
 // Constructor Implementation
 GameBoard::GameBoard() : gridLines(sf::Lines) {
@@ -71,15 +74,14 @@ void GameBoard::initializeBoardElements() {
         if (i == 0 || i == 2) { barColor = colorTop13; } else if (i == 4 || i == 6) { barColor = colorTop57; }
 
         if (barColor != sf::Color::Transparent) {
-            // --- Scope Reduced: Declare variables inside the if block ---
-            float barX = rectBounds.left;
-            float barY = rectBounds.top + rectBounds.height - colorBarThickness;
-            float barW = rectBounds.width;
-            float barH = colorBarThickness;
-            // --- End Scope Reduction ---
-            if (barW > 0 && barH > 0) {
-                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
-                colorBar.setPosition(barX, barY);
+            // Calculate size directly
+            float width = rectBounds.width;
+            float height = colorBarThickness;
+            if (width > 0 && height > 0) {
+                // Create shape with calculated size
+                sf::RectangleShape colorBar(sf::Vector2f(width, height));
+                // Set position directly
+                colorBar.setPosition(rectBounds.left, rectBounds.top + rectBounds.height - colorBarThickness);
                 configureColorBarFill(colorBar, barColor);
                 colorBarShapes.push_back(colorBar);
             }
@@ -95,15 +97,14 @@ void GameBoard::initializeBoardElements() {
          if (i == 0 || i == 2) { barColor = colorBottom13; } else if (i == 4 || i == 6) { barColor = colorBottom57; }
 
          if (barColor != sf::Color::Transparent) {
-             // --- Scope Reduced: Declare variables inside the if block ---
-             float barX = rectBounds.left;
-             float barY = rectBounds.top;
-             float barW = rectBounds.width;
-             float barH = colorBarThickness;
-             // --- End Scope Reduction ---
-             if (barW > 0 && barH > 0) {
-                 sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
-                 colorBar.setPosition(barX, barY);
+             // Calculate size directly
+             float width = rectBounds.width;
+             float height = colorBarThickness;
+             if (width > 0 && height > 0) {
+                 // Create shape with calculated size
+                 sf::RectangleShape colorBar(sf::Vector2f(width, height));
+                 // Set position directly
+                 colorBar.setPosition(rectBounds.left, rectBounds.top);
                  configureColorBarFill(colorBar, barColor);
                  colorBarShapes.push_back(colorBar);
              }
@@ -119,15 +120,14 @@ void GameBoard::initializeBoardElements() {
         if (i == 0 || i == 2) { barColor = colorLeft13; } else if (i == 4 || i == 6) { barColor = colorLeft57; }
 
         if (barColor != sf::Color::Transparent) {
-            // --- Scope Reduced: Declare variables inside the if block ---
-            float barX = rectBounds.left + rectBounds.width - colorBarThickness;
-            float barY = rectBounds.top;
-            float barW = colorBarThickness;
-            float barH = rectBounds.height;
-            // --- End Scope Reduction ---
-            if (barW > 0 && barH > 0) {
-                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
-                colorBar.setPosition(barX, barY);
+            // Calculate size directly
+            float width = colorBarThickness;
+            float height = rectBounds.height;
+            if (width > 0 && height > 0) {
+                // Create shape with calculated size
+                sf::RectangleShape colorBar(sf::Vector2f(width, height));
+                // Set position directly
+                colorBar.setPosition(rectBounds.left + rectBounds.width - colorBarThickness, rectBounds.top);
                 configureColorBarFill(colorBar, barColor);
                 colorBarShapes.push_back(colorBar);
             }
@@ -143,15 +143,14 @@ void GameBoard::initializeBoardElements() {
         if (i == 0 || i == 2) { barColor = colorRight13; } else if (i == 4 || i == 6) { barColor = colorRight57; }
 
         if (barColor != sf::Color::Transparent) {
-            // --- Scope Reduced: Declare variables inside the if block ---
-            float barX = rectBounds.left;
-            float barY = rectBounds.top;
-            float barW = colorBarThickness;
-            float barH = rectBounds.height;
-            // --- End Scope Reduction ---
-            if (barW > 0 && barH > 0) {
-                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
-                colorBar.setPosition(barX, barY);
+            // Calculate size directly
+            float width = colorBarThickness;
+            float height = rectBounds.height;
+            if (width > 0 && height > 0) {
+                // Create shape with calculated size
+                sf::RectangleShape colorBar(sf::Vector2f(width, height));
+                // Set position directly
+                colorBar.setPosition(rectBounds.left, rectBounds.top);
                 configureColorBarFill(colorBar, barColor);
                 colorBarShapes.push_back(colorBar);
             }
