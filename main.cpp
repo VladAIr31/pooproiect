@@ -4,291 +4,113 @@
 #include <iostream> // For std::cout, std::cerr
 #include <cmath>    // For std::abs, std::max, std::min
 #include <algorithm> // For std::max, std::min
-
-// Include your game logic headers
-#include "incl/Pawn.h"
-#include "incl/Card.h"
-#include "incl/Chalet.h"
-#include "incl/Hotel.h"
-#include "incl/Places.h"
 #include "incl/player.h"
+#include "incl/chalet.h"
+#include "incl/board.h"
+#include "incl/boardconf.h"
+#include "incl/prices.h"
+#include "incl/exception.h"
 
-#include "incl/board.h" // Provides constants
-  // Provides GameBoard class declaration
-
-// --- GameBoard Class Implementation ---
-// Define the methods declared in GameBoard.hpp here
-
-// Constructor Implementation
-GameBoard::GameBoard() : gridLines(sf::Lines) {
-    // Load textures first
-    if (!loadTexture(houseTexture, "incl/cabana.jpg") ||
-        !loadTexture(goCornerTexture, "incl/start.jpg") ||
-        !loadTexture(jailTexture, "incl/jail.jpg") ||
-        !loadTexture(parkingTexture, "incl/park.jpg") ||
-        !loadTexture(goToJailTexture, "incl/gtjail.jpg"))
-    {
-        std::cerr << "FATAL: Failed to load one or more essential textures. Exiting." << std::endl;
-        exit(1); // Exit if textures can't be loaded
-    }
-    // Initialize all board elements
-    initializeBoardElements();
-}
-
-// Texture Loading Helper Implementation
-bool GameBoard::loadTexture(sf::Texture& texture, const std::string& filename) {
-    if (!texture.loadFromFile(filename)) {
-        std::cerr << "Error loading texture: " << filename << std::endl;
-        return false;
-    }
-    texture.setSmooth(true);
-    return true;
-}
-
-// Initialization of Board Elements Implementation
-void GameBoard::initializeBoardElements() {
-    colorBarShapes.clear();
-    middleSprites.clear();
-    gridLines.clear();
-
-    // 1. Configure Corner Sprites
-    sf::FloatRect tlCornerBounds(boardOffsetX, boardOffsetY, cornerSize, cornerSize);
-    configureCornerSprite(topLeftCornerSprite, parkingTexture, tlCornerBounds);
-    sf::FloatRect trCornerBounds(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY, cornerSize, cornerSize);
-    configureCornerSprite(topRightCornerSprite, goToJailTexture, trCornerBounds);
-    sf::FloatRect brCornerBounds(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize, cornerSize, cornerSize);
-    configureCornerSprite(bottomRightCornerSprite, goCornerTexture, brCornerBounds);
-    sf::FloatRect blCornerBounds(boardOffsetX, boardOffsetY + boardTotalHeight - cornerSize, cornerSize, cornerSize);
-    configureCornerSprite(bottomLeftCornerSprite, jailTexture, blCornerBounds);
-
-    // --- Create Color Bars and Middle Sprites ---
-    const int middleIndex = 3;
-
-    // 2. Top Row
-    for (int i = 0; i < numSpacesPerSide; ++i) {
-        float currentX = boardOffsetX + cornerSize + i * topBottomSpaceWidth;
-        float currentY = boardOffsetY;
-        sf::FloatRect rectBounds(currentX, currentY, topBottomSpaceWidth, borderThickness);
-        sf::Color barColor = sf::Color::Transparent;
-        if (i == 0 || i == 2) { barColor = colorTop13; } else if (i == 4 || i == 6) { barColor = colorTop57; }
-
-        if (barColor != sf::Color::Transparent) {
-            // Calculate size directly
-            float width = rectBounds.width;
-            float height = colorBarThickness;
-            if (width > 0 && height > 0) {
-                // Create shape with calculated size
-                sf::RectangleShape colorBar(sf::Vector2f(width, height));
-                // Set position directly
-                colorBar.setPosition(rectBounds.left, rectBounds.top + rectBounds.height - colorBarThickness);
-                configureColorBarFill(colorBar, barColor);
-                colorBarShapes.push_back(colorBar);
-            }
-        }
-        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationTop)); }
-    }
-    // 3. Bottom Row
-    for (int i = 0; i < numSpacesPerSide; ++i) {
-         float currentX = boardOffsetX + cornerSize + i * topBottomSpaceWidth;
-         float currentY = boardOffsetY + boardTotalHeight - borderThickness;
-         sf::FloatRect rectBounds(currentX, currentY, topBottomSpaceWidth, borderThickness);
-         sf::Color barColor = sf::Color::Transparent;
-         if (i == 0 || i == 2) { barColor = colorBottom13; } else if (i == 4 || i == 6) { barColor = colorBottom57; }
-
-         if (barColor != sf::Color::Transparent) {
-             // Calculate size directly
-             float width = rectBounds.width;
-             float height = colorBarThickness;
-             if (width > 0 && height > 0) {
-                 // Create shape with calculated size
-                 sf::RectangleShape colorBar(sf::Vector2f(width, height));
-                 // Set position directly
-                 colorBar.setPosition(rectBounds.left, rectBounds.top);
-                 configureColorBarFill(colorBar, barColor);
-                 colorBarShapes.push_back(colorBar);
-             }
-         }
-         if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationBottom)); }
-     }
-    // 4. Left Column
-    for (int i = 0; i < numSpacesPerSide; ++i) {
-        float currentX = boardOffsetX;
-        float currentY = boardOffsetY + cornerSize + i * leftRightSpaceHeight;
-        sf::FloatRect rectBounds(currentX, currentY, borderThickness, leftRightSpaceHeight);
-        sf::Color barColor = sf::Color::Transparent;
-        if (i == 0 || i == 2) { barColor = colorLeft13; } else if (i == 4 || i == 6) { barColor = colorLeft57; }
-
-        if (barColor != sf::Color::Transparent) {
-            // Calculate size directly
-            float width = colorBarThickness;
-            float height = rectBounds.height;
-            if (width > 0 && height > 0) {
-                // Create shape with calculated size
-                sf::RectangleShape colorBar(sf::Vector2f(width, height));
-                // Set position directly
-                colorBar.setPosition(rectBounds.left + rectBounds.width - colorBarThickness, rectBounds.top);
-                configureColorBarFill(colorBar, barColor);
-                colorBarShapes.push_back(colorBar);
-            }
-        }
-        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationLeft)); }
-    }
-    // 5. Right Column
-    for (int i = 0; i < numSpacesPerSide; ++i) {
-        float currentX = boardOffsetX + boardTotalWidth - borderThickness;
-        float currentY = boardOffsetY + cornerSize + i * leftRightSpaceHeight;
-        sf::FloatRect rectBounds(currentX, currentY, borderThickness, leftRightSpaceHeight);
-        sf::Color barColor = sf::Color::Transparent;
-        if (i == 0 || i == 2) { barColor = colorRight13; } else if (i == 4 || i == 6) { barColor = colorRight57; }
-
-        if (barColor != sf::Color::Transparent) {
-            // Calculate size directly
-            float width = colorBarThickness;
-            float height = rectBounds.height;
-            if (width > 0 && height > 0) {
-                // Create shape with calculated size
-                sf::RectangleShape colorBar(sf::Vector2f(width, height));
-                // Set position directly
-                colorBar.setPosition(rectBounds.left, rectBounds.top);
-                configureColorBarFill(colorBar, barColor);
-                colorBarShapes.push_back(colorBar);
-            }
-        }
-        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationRight)); }
-     }
-
-    // --- Define Grid Lines ---
-    addLine(boardOffsetX, boardOffsetY, boardOffsetX + boardTotalWidth, boardOffsetY); // Top
-    addLine(boardOffsetX + boardTotalWidth, boardOffsetY, boardOffsetX + boardTotalWidth, boardOffsetY + boardTotalHeight); // Right
-    addLine(boardOffsetX + boardTotalWidth, boardOffsetY + boardTotalHeight, boardOffsetX, boardOffsetY + boardTotalHeight); // Bottom
-    addLine(boardOffsetX, boardOffsetY + boardTotalHeight, boardOffsetX, boardOffsetY); // Left
-    addLine(boardOffsetX + cornerSize, boardOffsetY + cornerSize, boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + cornerSize); // Top Inner
-    addLine(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + cornerSize, boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize); // Right Inner
-    addLine(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize, boardOffsetX + cornerSize, boardOffsetY + boardTotalHeight - cornerSize); // Bottom Inner
-    addLine(boardOffsetX + cornerSize, boardOffsetY + boardTotalHeight - cornerSize, boardOffsetX + cornerSize, boardOffsetY + cornerSize); // Left Inner
-    for(int i = 0; i < numSpacesPerSide - 1; ++i) {
-        float x = boardOffsetX + cornerSize + (i + 1) * topBottomSpaceWidth;
-        addLine(x, boardOffsetY, x, boardOffsetY + cornerSize); // Top row dividers
-        addLine(x, boardOffsetY + boardTotalHeight - cornerSize, x, boardOffsetY + boardTotalHeight); // Bottom row dividers
-    }
-    for(int i = 0; i < numSpacesPerSide - 1; ++i) {
-        float y = boardOffsetY + cornerSize + (i + 1) * leftRightSpaceHeight;
-        addLine(boardOffsetX, y, boardOffsetX + cornerSize, y); // Left column dividers
-        addLine(boardOffsetX + boardTotalWidth - cornerSize, y, boardOffsetX + boardTotalWidth, y); // Right column dividers
-    }
-}
-
-// Color Bar Fill Helper Implementation
-void GameBoard::configureColorBarFill(sf::RectangleShape& bar, const sf::Color& fillColor) {
-    bar.setFillColor(fillColor);
-    bar.setOutlineThickness(0);
-}
-
-// Centered Rotated Sprite Helper Implementation
-sf::Sprite GameBoard::createCenteredRotatedSprite(const sf::Texture& texture, sf::FloatRect targetBounds, float rotationAngle) {
-    sf::FloatRect paddedBounds;
-    paddedBounds.left = targetBounds.left + imagePadding;
-    paddedBounds.top = targetBounds.top + imagePadding;
-    paddedBounds.width = std::max(0.0f, targetBounds.width - 2.0f * imagePadding);
-    paddedBounds.height = std::max(0.0f, targetBounds.height - 2.0f * imagePadding);
-    if (paddedBounds.width <= 1e-3 || paddedBounds.height <= 1e-3) return sf::Sprite();
-    sf::Sprite sprite(texture);
-    float textureWidth = static_cast<float>(texture.getSize().x);
-    float textureHeight = static_cast<float>(texture.getSize().y);
-    if (textureWidth <= 1e-3 || textureHeight <= 1e-3) return sf::Sprite();
-    float scale = 1.0f;
-    bool isSideways = (std::abs(rotationAngle - 90.0f) < 1.0f || std::abs(rotationAngle - 270.0f) < 1.0f);
-    if (isSideways) {
-        float scaleX_rot = paddedBounds.width / textureHeight; float scaleY_rot = paddedBounds.height / textureWidth;
-        scale = std::min(scaleX_rot, scaleY_rot);
-    } else {
-        float scaleX = paddedBounds.width / textureWidth; float scaleY = paddedBounds.height / textureHeight;
-        scale = std::min(scaleX, scaleY);
-    }
-    scale = std::max(0.0f, scale);
-    sprite.setScale(scale, scale);
-    sprite.setOrigin(textureWidth / 2.0f, textureHeight / 2.0f);
-    sprite.setRotation(rotationAngle);
-    float paddedCenterX = paddedBounds.left + paddedBounds.width / 2.0f;
-    float paddedCenterY = paddedBounds.top + paddedBounds.height / 2.0f;
-    sprite.setPosition(paddedCenterX, paddedCenterY);
-    return sprite;
-}
-
-// Corner Sprite Helper Implementation
-void GameBoard::configureCornerSprite(sf::Sprite& sprite, const sf::Texture& texture, sf::FloatRect cornerBounds) {
-    sprite.setTexture(texture);
-    if (cornerBounds.width <= 1e-3 || cornerBounds.height <= 1e-3) { sprite.setScale(0, 0); return; }
-    float texW = static_cast<float>(texture.getSize().x); float texH = static_cast<float>(texture.getSize().y);
-    if (texW <= 1e-3 || texH <= 1e-3) { sprite.setScale(0, 0); return; }
-    float scaleX = cornerBounds.width / texW; float scaleY = cornerBounds.height / texH;
-    float scale = std::min(scaleX, scaleY);
-    scale = std::max(0.0f, scale);
-    sprite.setScale(scale, scale);
-    sprite.setPosition(cornerBounds.left, cornerBounds.top);
-}
-
-// Add Line Helper Implementation
-void GameBoard::addLine(float x1, float y1, float x2, float y2) {
-    gridLines.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::Black));
-    gridLines.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::Black));
-}
-
-// Draw Method Implementation
-void GameBoard::draw(sf::RenderTarget& target) const {
-    target.draw(topLeftCornerSprite);
-    target.draw(topRightCornerSprite);
-    target.draw(bottomRightCornerSprite);
-    target.draw(bottomLeftCornerSprite);
-    for (const auto& shape : colorBarShapes) { target.draw(shape); }
-    for (const auto& sprite : middleSprites) { target.draw(sprite); }
-    target.draw(gridLines);
-}
-
-
-// --- Main Function ---
 int main() {
-    // --- Initial Game Setup (Example) ---
-    pawn A("green", {1, 2});
-    player one("Marcel", A, 5000);
-    chalet sus("Susai", 500);
-    card Power("Special", "Now");
-    place Su("Suceava", 3000);
 
-    std::cout << A << '\n' << one << '\n' << sus << '\n' << Power << '\n' << Su << '\n';
-    one.add_card(Power);
-    one.add_place(Su);
-    std::cout << one << '\n';
-    one.usecard(Power);
-    std::cout << one << '\n';
-    one.sell_place(Su);
-    std::cout << one << '\n';
 
-    // --- SFML Window Setup ---
+
+
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Monopoly Style Board - Single CPP");
     window.setFramerateLimit(60);
 
-    // --- Create the Game Board ---
-    GameBoard gameBoard; // Constructor defined above is called
+    GameBoard gameBoard;
 
-    // --- Main Game Loop ---
+    try {
+        pawn p1_pawn("Rosu", {0, 0});
+        player p1("Alice", p1_pawn, 500);
+        std::cout << "Jucatorul initial:\n" << p1 << std::endl;
+
+        auto chalet_ptr = std::make_unique<chalet>("Cabana Munte", 200);
+        p1.add_property(std::move(chalet_ptr)); // Alice cumpără cabana
+        std::cout << "Dupa cumparare:\n" << p1 << std::endl;
+
+
+        int payment1 = 100;
+        std::cout << "Alice incearca sa plateasca " << payment1 << "..." << std::endl;
+        p1.pay(payment1);
+        std::cout << "Plata reusita. Buget ramas: " << p1.getBuget() << std::endl;
+
+        int payment2 = 1000;
+        std::cout << "\nAlice incearca sa plateasca " << payment2 << "..." << std::endl;
+        p1.pay(payment2);
+
+        std::cout << "Aceasta linie nu ar trebui sa apara daca plata 2 esueaza." << std::endl;
+
+    } catch (const FonduriInsuficienteError& e) {
+        std::cerr << "\n!!! Eroare de Plata !!!\n";
+        std::cerr << "Detalii: " << e.what() << std::endl;
+
+
+    } catch (const RomopolyError& e) {
+        // Prindem orice altă eroare specifică jocului derivată din RomopolyError
+        std::cerr << "\n!!! Eroare Generala de Joc !!!\n";
+        std::cerr << "Detalii: " << e.what() << std::endl;
+        // Poți trata diferit alte erori ale jocului
+
+    } catch (const std::exception& e) {
+        // Prindem orice altă excepție standard (bună practică)
+        std::cerr << "\n!!! Eroare Standard C++ !!!\n";
+        std::cerr << "Detalii: " << e.what() << std::endl;
+
+    } catch (...) {
+        std::cerr << "\n!!! Eroare Necunoscuta !!!" << std::endl;
+    }
+
+    std::cout << "\nContinuam executia dupa blocul try/catch...\n" << std::endl;
+
+
+
+
+    std::string potentialName = "Player1_Valid";
+    if (player::isPlayerNameValid(potentialName)) {
+        std::cout << "'" << potentialName << "' este un nume valid.\n";
+        pawn p1_pawn("Albastru", {0,0});
+        player p1(potentialName, p1_pawn, 1500);
+
+        pawn p2_pawn("Verde", {0,0});
+        player p2("Player2", p2_pawn, 1500);
+
+        std::cout << "Numar curent de jucatori activi: " << player::getActivePlayers() << std::endl;
+
+        {
+            pawn p3_pawn("Galben", {0,0});
+            player p3 = p1;
+            std::cout << "Numar curent de jucatori activi (dupa copiere): " << player::getActivePlayers() << std::endl;
+        }
+
+        std::cout << "Numar curent de jucatori activi (dupa iesire bloc): " << player::getActivePlayers() << std::endl;
+
+    } else {
+        std::cout << "'" << potentialName << "' NU este un nume valid.\n";
+    }
+
+
+
+    std::cout << "Numar de jucatori activi la sfarsitul lui main (inainte de return): " << player::getActivePlayers() << std::endl;
+
+
+
+
+
+
     while (window.isOpen()) {
-        // --- Event Handling ---
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-            // Add other event handling here
         }
 
-        // --- Game Logic Update ---
-        // (Add your game logic updates here)
 
-        // --- Drawing ---
         window.clear(sf::Color(200, 200, 200));
         gameBoard.draw(window); // Use the draw method defined above
-        // Draw other elements (pawns, UI) here
+
         window.display();
     }
 

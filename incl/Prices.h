@@ -5,8 +5,13 @@
 #ifndef PRICES_H
 #define PRICES_H
 #include <iostream>
+#include <vector>
+
+//#include "player.h"
+class player;
+
 class prices {
-protected:
+
     int price;
     int sell_price;
 
@@ -17,6 +22,8 @@ public:
     virtual int get_sell_price() const { return sell_price; }
 
     virtual void print(std::ostream &os) const = 0;
+    virtual prices* clone() const = 0;
+    virtual int calculateRent(const player & owner) const = 0;
 
     virtual ~prices() = default;
 

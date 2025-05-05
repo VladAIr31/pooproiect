@@ -4,54 +4,67 @@
 
 #ifndef PLAYER_H
 #define PLAYER_H
+#include <string>
+#include <vector>
+#include <memory> // Pentru std::unique_ptr
 #include <iostream>
+
+
 #include "Card.h"
 #include "Pawn.h"
-#include "Places.h"
+#include "Prices.h"
+
+
 class player {
+private:
     std::string name;
     pawn p;
     int buget;
     std::vector<card> cards;
-    std::vector<place> ownership;
+    // Folosim unique_ptr pentru a gestiona proprietățile polimorfice
+    std::vector<std::unique_ptr<prices>> ownership;
+    static int activePlayers;
+
 public:
-    player(const std::string& name, const pawn& p, int buget)
-       : name(name), p(p), buget(buget), cards(), ownership() {}
-    friend std::ostream &operator<<(std::ostream &os, const player &pa) {
-        os<<pa.name<<' '<<pa.buget<<' '<<pa.p;
-        for (auto const  &card : pa.cards) {
-            os<<' '<<card;
-        }
-        for (auto const  &own : pa.ownership) {
-            os<<' '<<own;
-        }
+    // Constructor
+    player(const std::string& name, const pawn& p, int buget);
+
+
+    player(const player& other);
+
+    // Operator de atribuire prin copiere (Deep Copy)
+    player& operator=(const player& other);
+
+    // Destructor
+    ~player() ;
+
+    // Metode pentru gestionarea proprietăților
+    void add_property(std::unique_ptr<prices> prop);
+    std::unique_ptr<prices> sell_property(int index);
+
+    int countOwnedChalets() const;
+
+
+    // Metode pentru carduri
+    void add_card(const card& c);
 
 
 
+    const std::string& getName() const;
+    int getBuget() const;
+    const pawn& getPawn() const; // Getter adăugat pentru pion
+    const std::vector<std::unique_ptr<prices>>& getOwnership() const; // Getter pentru proprietăți
 
-        return os;
-    }
-    void add_card(const card& c) {
-        if (c.get_type()!="Now")
-            cards.push_back(c);
-    }
-    void add_place (const  place& pl) {
-        int price=pl.get_price();
-        if (buget>=price)
-            ownership.push_back(pl), buget=buget-price;
-        else std::cout << "You are broke" << std::endl;
+    // Metode pentru modificarea bugetului
+    void pay(int amount);
+    void receive(int amount);
 
+    static int getActivePlayers();
+    static  bool isPlayerNameValid(const std::string& name);
 
-    }
-    void usecard ( const card & c) {
-        cards.erase(find(cards.begin(), cards.end(), c));
-    }
-    void sell_place (const place& pl) {
-        int price=pl.get_sell_price();
-        buget+=price;
-        ownership.erase(find(ownership.begin(), ownership.end(), pl));
-
-    }
+    // Funcție prietenă pentru afișare
+    friend std::ostream& operator<<(std::ostream& os, const player& pa);
 };
 
+std::ostream& operator<<(std::ostream& os, const player& pa);
 #endif //PLAYER_H

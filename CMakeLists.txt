@@ -48,17 +48,20 @@ elseif(UNIX)
 endif()
 
 ###############################################################################
+file(GLOB_RECURSE INCLUDE_FILES "incl/*.h" "incl/*.hpp")
 
+# Find all source files in the incl directory and its subdirectories
+file(GLOB_RECURSE SOURCE_FILES_INCL "incl/*.cpp")
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${PROJECT_NAME}
     main.cpp
     generated/src/Helper.cpp
     env_fixes.h
+        ${SOURCE_FILES_INCL}
+        ${INCLUDE_FILES}
 
 
 
-        #include "incl/boardconf.h"
-        #include "incl/board.h"
 )
 
 include(cmake/CompilerFlags.cmake)
