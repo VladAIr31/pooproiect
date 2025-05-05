@@ -1,165 +1,281 @@
-#include <iostream>
-#include <array>
-#include <chrono>
-#include <thread>
-
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <string>
+#include <iostream> // For std::cout, std::cerr
+#include <cmath>    // For std::abs, std::max, std::min
+#include <algorithm> // For std::max, std::min
 
+// Include your game logic headers
+#include "incl/Pawn.h"
+#include "incl/Card.h"
+#include "incl/Chalet.h"
+#include "incl/Hotel.h"
+#include "incl/Places.h"
+#include "incl/player.h"
 
+// Include the header files for configuration and class declaration
+#include "incl/boardconf.h" // Provides constants
+#include "incl/board.h"    // Provides GameBoard class declaration
 
+// --- GameBoard Class Implementation ---
+// Define the methods declared in GameBoard.hpp here
 
-
-class  pawn {
-    std::string color;
-    std::pair<int, int> position;
-public:
-    pawn(std::string color, std::pair<int, int> position) :
-    color(color), position(position) {}
-
-    pawn(const pawn &p): color(p.color), position(p.position) {}
-
-    pawn& operator=(const pawn &p) {
-        color = p.color;
-        position = p.position;
-        return *this;
+// Constructor Implementation
+GameBoard::GameBoard() : gridLines(sf::Lines) {
+    // Load textures first
+    if (!loadTexture(houseTexture, "incl/cabana.jpg") ||
+        !loadTexture(goCornerTexture, "incl/start.jpg") ||
+        !loadTexture(jailTexture, "incl/jail.jpg") ||
+        !loadTexture(parkingTexture, "incl/park.jpg") ||
+        !loadTexture(goToJailTexture, "incl/gtjail.jpg"))
+    {
+        std::cerr << "FATAL: Failed to load one or more essential textures. Exiting." << std::endl;
+        exit(1); // Exit if textures can't be loaded
     }
-    ~pawn() {}
-    friend std::ostream &operator<<(std::ostream &os, const pawn &p) {
-        os << p.color<<' '<<p.position.first<<' '<<p.position.second;
-        return os;
+    // Initialize all board elements
+    initializeBoardElements();
+}
+
+// Texture Loading Helper Implementation
+bool GameBoard::loadTexture(sf::Texture& texture, const std::string& filename) {
+    if (!texture.loadFromFile(filename)) {
+        std::cerr << "Error loading texture: " << filename << std::endl;
+        return false;
     }
-};
-class card {
-    std::string type;
-    std::string use;
-public:
-    card(const std::string &type,  const std::string &use) :
-    type(type), use(use) {}
-    friend std::ostream &operator<<(std::ostream &os, const card &c) {
-        os << c.type<<' '<<c.use;
-        return os;
-    }
-    bool operator==(const card &) const {
-        return true;
-    }
-    const std::string& get_type() const  { return type; }
-};
+    texture.setSmooth(true);
+    return true;
+}
 
+// Initialization of Board Elements Implementation
+void GameBoard::initializeBoardElements() {
+    colorBarShapes.clear();
+    middleSprites.clear();
+    gridLines.clear();
 
-class hotel {
-    int price=500;
-    int sell_price=200;
-public:
-    friend std::ostream &operator<<(std::ostream &os, const hotel &h) {
-        os << h.price<<' '<<h.sell_price;
-        return os;
-    }
-};
+    // 1. Configure Corner Sprites
+    sf::FloatRect tlCornerBounds(boardOffsetX, boardOffsetY, cornerSize, cornerSize);
+    configureCornerSprite(topLeftCornerSprite, parkingTexture, tlCornerBounds);
+    sf::FloatRect trCornerBounds(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY, cornerSize, cornerSize);
+    configureCornerSprite(topRightCornerSprite, goToJailTexture, trCornerBounds);
+    sf::FloatRect brCornerBounds(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize, cornerSize, cornerSize);
+    configureCornerSprite(bottomRightCornerSprite, goCornerTexture, brCornerBounds);
+    sf::FloatRect blCornerBounds(boardOffsetX, boardOffsetY + boardTotalHeight - cornerSize, cornerSize, cornerSize);
+    configureCornerSprite(bottomLeftCornerSprite, jailTexture, blCornerBounds);
 
-class chalet {
-    std::string name;
-    int price;
-    int sell_price;
+    // --- Create Color Bars and Middle Sprites ---
+    const int middleIndex = 3;
 
-
-public:
-    chalet(const std::string &name, int price)
-        : name(name), price(price), sell_price(price*3/10) {}
-    friend std::ostream &operator<<(std::ostream &os, const chalet &c) {
-        os<<c.name<<' '<<c.price<<' '<<c.sell_price;
-        return os;
-    }
-
-};
-class place {
-    std::string name;
-    int price;
-    int sell_price;
-    int nr_hotels;
-public:
-    place( const std::string &name, int price):
-    name(name),
-    price(price), sell_price((price*2)/5),
-    nr_hotels()
-    {}
-    friend std::ostream &operator<<(std::ostream &os, const place &p) {
-        os<<p.name<<' '<<p.price<<' '<<p.sell_price<<' '<<p.nr_hotels;
-        return os;
-    }
-    int get_price()  const{ return price; }
-    int get_sell_price()  const{ return sell_price; }
-    bool operator==(const place &) const {
-        return true;
-    }
-
-};
-
-class player {
-    std::string name;
-    pawn p;
-    int buget;
-    std::vector<card> cards;
-    std::vector<place> ownership;
-public:
-    player(const std::string& name, const pawn& p, int buget)
-       : name(name), p(p), buget(buget), cards(), ownership() {}
-    friend std::ostream &operator<<(std::ostream &os, const player &pa) {
-        os<<pa.name<<' '<<pa.buget<<' '<<pa.p;
-        for (auto const  &card : pa.cards) {
-            os<<' '<<card;
-        }
-            for (auto const  &own : pa.ownership) {
-                os<<' '<<own;
+    // 2. Top Row
+    for (int i = 0; i < numSpacesPerSide; ++i) {
+        float currentX = boardOffsetX + cornerSize + i * topBottomSpaceWidth;
+        float currentY = boardOffsetY;
+        sf::FloatRect rectBounds(currentX, currentY, topBottomSpaceWidth, borderThickness);
+        sf::Color barColor = sf::Color::Transparent;
+        if (i == 0 || i == 2) { barColor = colorTop13; } else if (i == 4 || i == 6) { barColor = colorTop57; }
+        if (barColor != sf::Color::Transparent) {
+            float barX = rectBounds.left; float barY = rectBounds.top + rectBounds.height - colorBarThickness;
+            float barW = rectBounds.width; float barH = colorBarThickness;
+            if (barW > 0 && barH > 0) {
+                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
+                colorBar.setPosition(barX, barY);
+                configureColorBarFill(colorBar, barColor);
+                colorBarShapes.push_back(colorBar);
             }
-
-
-
-
-        return os;
+        }
+        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationTop)); }
     }
-    void add_card(const card& c) {
-        if (c.get_type()!="Now")
-        cards.push_back(c);
+    // 3. Bottom Row
+    for (int i = 0; i < numSpacesPerSide; ++i) {
+         float currentX = boardOffsetX + cornerSize + i * topBottomSpaceWidth;
+         float currentY = boardOffsetY + boardTotalHeight - borderThickness;
+         sf::FloatRect rectBounds(currentX, currentY, topBottomSpaceWidth, borderThickness);
+         sf::Color barColor = sf::Color::Transparent;
+         if (i == 0 || i == 2) { barColor = colorBottom13; } else if (i == 4 || i == 6) { barColor = colorBottom57; }
+         if (barColor != sf::Color::Transparent) {
+             float barX = rectBounds.left; float barY = rectBounds.top;
+             float barW = rectBounds.width; float barH = colorBarThickness;
+             if (barW > 0 && barH > 0) {
+                 sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
+                 colorBar.setPosition(barX, barY);
+                 configureColorBarFill(colorBar, barColor);
+                 colorBarShapes.push_back(colorBar);
+             }
+         }
+         if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationBottom)); }
+     }
+    // 4. Left Column
+    for (int i = 0; i < numSpacesPerSide; ++i) {
+        float currentX = boardOffsetX;
+        float currentY = boardOffsetY + cornerSize + i * leftRightSpaceHeight;
+        sf::FloatRect rectBounds(currentX, currentY, borderThickness, leftRightSpaceHeight);
+        sf::Color barColor = sf::Color::Transparent;
+        if (i == 0 || i == 2) { barColor = colorLeft13; } else if (i == 4 || i == 6) { barColor = colorLeft57; }
+        if (barColor != sf::Color::Transparent) {
+            float barX = rectBounds.left + rectBounds.width - colorBarThickness; float barY = rectBounds.top;
+            float barW = colorBarThickness; float barH = rectBounds.height;
+            if (barW > 0 && barH > 0) {
+                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
+                colorBar.setPosition(barX, barY);
+                configureColorBarFill(colorBar, barColor);
+                colorBarShapes.push_back(colorBar);
+            }
+        }
+        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationLeft)); }
     }
-    void add_place (const  place& pl) {
-        int price=pl.get_price();
-        if (buget>=price)
-            ownership.push_back(pl), buget=buget-price;
-        else std::cout << "You are broke" << std::endl;
+    // 5. Right Column
+    for (int i = 0; i < numSpacesPerSide; ++i) {
+        float currentX = boardOffsetX + boardTotalWidth - borderThickness;
+        float currentY = boardOffsetY + cornerSize + i * leftRightSpaceHeight;
+        sf::FloatRect rectBounds(currentX, currentY, borderThickness, leftRightSpaceHeight);
+        sf::Color barColor = sf::Color::Transparent;
+        if (i == 0 || i == 2) { barColor = colorRight13; } else if (i == 4 || i == 6) { barColor = colorRight57; }
+        if (barColor != sf::Color::Transparent) {
+            float barX = rectBounds.left; float barY = rectBounds.top;
+            float barW = colorBarThickness; float barH = rectBounds.height;
+            if (barW > 0 && barH > 0) {
+                sf::RectangleShape colorBar(sf::Vector2f(barW, barH));
+                colorBar.setPosition(barX, barY);
+                configureColorBarFill(colorBar, barColor);
+                colorBarShapes.push_back(colorBar);
+            }
+        }
+        if (i == middleIndex) { middleSprites.push_back(createCenteredRotatedSprite(houseTexture, rectBounds, rotationRight)); }
+     }
 
-
+    // --- Define Grid Lines ---
+    addLine(boardOffsetX, boardOffsetY, boardOffsetX + boardTotalWidth, boardOffsetY); // Top
+    addLine(boardOffsetX + boardTotalWidth, boardOffsetY, boardOffsetX + boardTotalWidth, boardOffsetY + boardTotalHeight); // Right
+    addLine(boardOffsetX + boardTotalWidth, boardOffsetY + boardTotalHeight, boardOffsetX, boardOffsetY + boardTotalHeight); // Bottom
+    addLine(boardOffsetX, boardOffsetY + boardTotalHeight, boardOffsetX, boardOffsetY); // Left
+    addLine(boardOffsetX + cornerSize, boardOffsetY + cornerSize, boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + cornerSize); // Top Inner
+    addLine(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + cornerSize, boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize); // Right Inner
+    addLine(boardOffsetX + boardTotalWidth - cornerSize, boardOffsetY + boardTotalHeight - cornerSize, boardOffsetX + cornerSize, boardOffsetY + boardTotalHeight - cornerSize); // Bottom Inner
+    addLine(boardOffsetX + cornerSize, boardOffsetY + boardTotalHeight - cornerSize, boardOffsetX + cornerSize, boardOffsetY + cornerSize); // Left Inner
+    for(int i = 0; i < numSpacesPerSide - 1; ++i) {
+        float x = boardOffsetX + cornerSize + (i + 1) * topBottomSpaceWidth;
+        addLine(x, boardOffsetY, x, boardOffsetY + cornerSize); // Top row dividers
+        addLine(x, boardOffsetY + boardTotalHeight - cornerSize, x, boardOffsetY + boardTotalHeight); // Bottom row dividers
     }
-    void usecard ( const card & c) {
-        cards.erase(find(cards.begin(), cards.end(), c));
+    for(int i = 0; i < numSpacesPerSide - 1; ++i) {
+        float y = boardOffsetY + cornerSize + (i + 1) * leftRightSpaceHeight;
+        addLine(boardOffsetX, y, boardOffsetX + cornerSize, y); // Left column dividers
+        addLine(boardOffsetX + boardTotalWidth - cornerSize, y, boardOffsetX + boardTotalWidth, y); // Right column dividers
     }
-    void sell_place (const place& pl) {
-        int price=pl.get_sell_price();
-        buget+=price;
-        ownership.erase(find(ownership.begin(), ownership.end(), pl));
+}
 
+// Color Bar Fill Helper Implementation
+void GameBoard::configureColorBarFill(sf::RectangleShape& bar, const sf::Color& fillColor) {
+    bar.setFillColor(fillColor);
+    bar.setOutlineThickness(0);
+}
+
+// Centered Rotated Sprite Helper Implementation
+sf::Sprite GameBoard::createCenteredRotatedSprite(const sf::Texture& texture, sf::FloatRect targetBounds, float rotationAngle) {
+    sf::FloatRect paddedBounds;
+    paddedBounds.left = targetBounds.left + imagePadding;
+    paddedBounds.top = targetBounds.top + imagePadding;
+    paddedBounds.width = std::max(0.0f, targetBounds.width - 2.0f * imagePadding);
+    paddedBounds.height = std::max(0.0f, targetBounds.height - 2.0f * imagePadding);
+    if (paddedBounds.width <= 1e-3 || paddedBounds.height <= 1e-3) return sf::Sprite();
+    sf::Sprite sprite(texture);
+    float textureWidth = static_cast<float>(texture.getSize().x);
+    float textureHeight = static_cast<float>(texture.getSize().y);
+    if (textureWidth <= 1e-3 || textureHeight <= 1e-3) return sf::Sprite();
+    float scale = 1.0f;
+    bool isSideways = (std::abs(rotationAngle - 90.0f) < 1.0f || std::abs(rotationAngle - 270.0f) < 1.0f);
+    if (isSideways) {
+        float scaleX_rot = paddedBounds.width / textureHeight; float scaleY_rot = paddedBounds.height / textureWidth;
+        scale = std::min(scaleX_rot, scaleY_rot);
+    } else {
+        float scaleX = paddedBounds.width / textureWidth; float scaleY = paddedBounds.height / textureHeight;
+        scale = std::min(scaleX, scaleY);
     }
-};
+    scale = std::max(0.0f, scale);
+    sprite.setScale(scale, scale);
+    sprite.setOrigin(textureWidth / 2.0f, textureHeight / 2.0f);
+    sprite.setRotation(rotationAngle);
+    float paddedCenterX = paddedBounds.left + paddedBounds.width / 2.0f;
+    float paddedCenterY = paddedBounds.top + paddedBounds.height / 2.0f;
+    sprite.setPosition(paddedCenterX, paddedCenterY);
+    return sprite;
+}
+
+// Corner Sprite Helper Implementation
+void GameBoard::configureCornerSprite(sf::Sprite& sprite, const sf::Texture& texture, sf::FloatRect cornerBounds) {
+    sprite.setTexture(texture);
+    if (cornerBounds.width <= 1e-3 || cornerBounds.height <= 1e-3) { sprite.setScale(0, 0); return; }
+    float texW = static_cast<float>(texture.getSize().x); float texH = static_cast<float>(texture.getSize().y);
+    if (texW <= 1e-3 || texH <= 1e-3) { sprite.setScale(0, 0); return; }
+    float scaleX = cornerBounds.width / texW; float scaleY = cornerBounds.height / texH;
+    float scale = std::min(scaleX, scaleY);
+    scale = std::max(0.0f, scale);
+    sprite.setScale(scale, scale);
+    sprite.setPosition(cornerBounds.left, cornerBounds.top);
+}
+
+// Add Line Helper Implementation
+void GameBoard::addLine(float x1, float y1, float x2, float y2) {
+    gridLines.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::Black));
+    gridLines.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::Black));
+}
+
+// Draw Method Implementation
+void GameBoard::draw(sf::RenderTarget& target) const {
+    target.draw(topLeftCornerSprite);
+    target.draw(topRightCornerSprite);
+    target.draw(bottomRightCornerSprite);
+    target.draw(bottomLeftCornerSprite);
+    for (const auto& shape : colorBarShapes) { target.draw(shape); }
+    for (const auto& sprite : middleSprites) { target.draw(sprite); }
+    target.draw(gridLines);
+}
 
 
-
+// --- Main Function ---
 int main() {
-    pawn A("green",{1,2});
-    player one("Marcel",A,5000);
-    chalet sus("Susai",500);
-    card Power("Special","Now");
-    place Su("Suceava",3000);
-    std::cout<<A<<'\n'<<one<<'\n'<<sus<<'\n'<<Power<<'\n'<<Su<<'\n';
+    // --- Initial Game Setup (Example) ---
+    pawn A("green", {1, 2});
+    player one("Marcel", A, 5000);
+    chalet sus("Susai", 500);
+    card Power("Special", "Now");
+    place Su("Suceava", 3000);
+
+    std::cout << A << '\n' << one << '\n' << sus << '\n' << Power << '\n' << Su << '\n';
     one.add_card(Power);
     one.add_place(Su);
-    std::cout<<one<<'\n';
+    std::cout << one << '\n';
     one.usecard(Power);
-    std::cout<<one<<'\n';
+    std::cout << one << '\n';
     one.sell_place(Su);
-    std::cout<<one<<'\n';
+    std::cout << one << '\n';
 
+    // --- SFML Window Setup ---
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Monopoly Style Board - Single CPP");
+    window.setFramerateLimit(60);
 
+    // --- Create the Game Board ---
+    GameBoard gameBoard; // Constructor defined above is called
 
+    // --- Main Game Loop ---
+    while (window.isOpen()) {
+        // --- Event Handling ---
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+            // Add other event handling here
+        }
 
+        // --- Game Logic Update ---
+        // (Add your game logic updates here)
+
+        // --- Drawing ---
+        window.clear(sf::Color(200, 200, 200));
+        gameBoard.draw(window); // Use the draw method defined above
+        // Draw other elements (pawns, UI) here
+        window.display();
+    }
 
     return 0;
 }
