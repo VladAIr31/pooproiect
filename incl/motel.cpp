@@ -12,7 +12,7 @@ motel::motel(const std::string &name, int price)
 int motel::calculateRent(const player& owner) const {
 
 
-    int owned_count = owner.countOwnedMotels(); // Apelăm metoda din player
+    int owned_count = owner.countOwnnedMotels(); // Apelăm metoda din player
     switch (owned_count) {
         case 1: return 100;
         case 2: return 200;
