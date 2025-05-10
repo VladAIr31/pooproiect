@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-#include <iostream> // For std::cout, std::cerr
-#include <cmath>    // For std::abs, std::max, std::min
-#include <algorithm> // For std::max, std::min
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 #include "incl/player.h"
 #include "incl/Chalet.h"
 #include "incl/board.h"
@@ -47,19 +47,6 @@ int main() {
         std::cerr << "Detalii: " << e.what() << std::endl;
 
 
-    } catch (const RomopolyError& e) {
-        // Prindem orice altă eroare specifică jocului derivată din RomopolyError
-        std::cerr << "\n!!! Eroare Generala de Joc !!!\n";
-        std::cerr << "Detalii: " << e.what() << std::endl;
-        // Poți trata diferit alte erori ale jocului
-
-    } catch (const std::exception& e) {
-        // Prindem orice altă excepție standard (bună practică)
-        std::cerr << "\n!!! Eroare Standard C++ !!!\n";
-        std::cerr << "Detalii: " << e.what() << std::endl;
-
-    } catch (...) {
-        std::cerr << "\n!!! Eroare Necunoscuta !!!" << std::endl;
     }
 
     std::cout << "\nContinuam executia dupa blocul try/catch...\n" << std::endl;

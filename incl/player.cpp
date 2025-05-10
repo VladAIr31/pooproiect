@@ -82,10 +82,8 @@ std::unique_ptr<prices> player::sell_property(int index) {
     int sell_value = ownership[index]->get_sell_price();
     buget += sell_value;
 
-    // Extrage unique_ptr din vector folosind std::move
     std::unique_ptr<prices> sold_prop = std::move(ownership[index]);
 
-    // Elimină elementul (acum nullptr) din vector
     ownership.erase(ownership.begin() + index);
 
     std::cout << name << " a vandut: " << *sold_prop << " pentru " << sell_value << std::endl;

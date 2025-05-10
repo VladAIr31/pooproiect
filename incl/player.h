@@ -6,7 +6,7 @@
 #define PLAYER_H
 #include <string>
 #include <vector>
-#include <memory> // Pentru std::unique_ptr
+#include <memory>
 #include <iostream>
 
 
@@ -32,7 +32,6 @@ public:
 
     player(const player& other);
 
-    // Operator de atribuire prin copiere (Deep Copy)
     player& operator=(const player& other);
 
     // Destructor
@@ -63,7 +62,6 @@ public:
     static int getActivePlayers();
     static  bool isPlayerNameValid(const std::string& name);
 
-    // Funcție prietenă pentru afișare
     friend std::ostream& operator<<(std::ostream& os, const player& pa);
 };
 
