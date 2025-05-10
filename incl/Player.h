@@ -15,45 +15,45 @@
 #include "Prices.h"
 
 
-class player {
+class Player {
 private:
     std::string name;
-    pawn p;
+    Pawn p;
     int buget;
-    std::vector<card> cards;
+    std::vector<Card> cards;
     // Folosim unique_ptr pentru a gestiona proprietățile polimorfice
-    std::vector<std::unique_ptr<prices>> ownership;
+    std::vector<std::unique_ptr<Prices>> ownership;
     static int activePlayers;
 
 public:
     // Constructor
-    player(const std::string& name, const pawn& p, int buget);
+    Player(const std::string& name, const Pawn& p, int buget);
 
 
-    player(const player& other);
+    Player(const Player& other);
 
-    player& operator=(const player& other);
+    Player& operator=(const Player& other);
 
     // Destructor
-    ~player() ;
+    ~Player() ;
 
     // Metode pentru gestionarea proprietăților
-    void add_property(std::unique_ptr<prices> prop);
-    std::unique_ptr<prices> sell_property(int index);
+    void add_property(std::unique_ptr<Prices> prop);
+    std::unique_ptr<Prices> sell_property(int index);
 
     int countOwnedChalets() const;
     int countOwnnedMotels() const;
 
 
     // Metode pentru carduri
-    void add_card(const card& c);
+    void add_card(const Card& c);
 
 
 
     const std::string& getName() const;
     int getBuget() const;
-    const pawn& getPawn() const; // Getter adăugat pentru pion
-    const std::vector<std::unique_ptr<prices>>& getOwnership() const; // Getter pentru proprietăți
+    const Pawn& getPawn() const; // Getter adăugat pentru pion
+    const std::vector<std::unique_ptr<Prices>>& getOwnership() const; // Getter pentru proprietăți
 
     // Metode pentru modificarea bugetului
     void pay(int amount);
@@ -62,8 +62,8 @@ public:
     static int getActivePlayers();
     static  bool isPlayerNameValid(const std::string& name);
 
-    friend std::ostream& operator<<(std::ostream& os, const player& pa);
+    friend std::ostream& operator<<(std::ostream& os, const Player& pa);
 };
 
-std::ostream& operator<<(std::ostream& os, const player& pa);
+std::ostream& operator<<(std::ostream& os, const Player& pa);
 #endif //PLAYER_H

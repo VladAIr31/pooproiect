@@ -12,7 +12,7 @@
 #include <iostream> // For error messages in constructor/helpers if needed
 
 // Include the board configuration constants
-#include "boardconf.h" // Uses constants like boardOffsetX, etc.
+#include "Boardconf.h" // Uses constants like boardOffsetX, etc.
 
 class GameBoard {
 public:

@@ -5,22 +5,22 @@
 #ifndef PAWN_H
 #define PAWN_H
 #include <iostream>
-class  pawn {
+class  Pawn {
     std::string color;
     std::pair<int, int> position;
 public:
-    pawn(std::string color, std::pair<int, int> position) :
+    Pawn(std::string color, std::pair<int, int> position) :
     color(color), position(position) {}
 
-    pawn(const pawn &p): color(p.color), position(p.position) {}
+    Pawn(const Pawn &p): color(p.color), position(p.position) {}
 
-    pawn& operator=(const pawn &p) {
+    Pawn& operator=(const Pawn &p) {
         color = p.color;
         position = p.position;
         return *this;
     }
-    ~pawn() {}
-    friend std::ostream &operator<<(std::ostream &os, const pawn &p) {
+    ~Pawn() {}
+    friend std::ostream &operator<<(std::ostream &os, const Pawn &p) {
         os << p.color<<' '<<p.position.first<<' '<<p.position.second;
         return os;
     }

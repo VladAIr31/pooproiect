@@ -1,4 +1,4 @@
-#include "player.h"
+#include "Player.h"
 
 #include "board.h" // Provides constants
   // Provides GameBoard class declaration
@@ -9,11 +9,11 @@
 // Constructor Implementation
 GameBoard::GameBoard() : gridLines(sf::Lines) {
     // Load textures first
-    if (!loadTexture(houseTexture, "incl/cabana.jpg") ||
-        !loadTexture(goCornerTexture, "incl/start.jpg") ||
-        !loadTexture(jailTexture, "incl/jail.jpg") ||
-        !loadTexture(parkingTexture, "incl/park.jpg") ||
-        !loadTexture(goToJailTexture, "incl/gtjail.jpg"))
+    if (!loadTexture(houseTexture, "incl/images/cabana.jpg") ||
+        !loadTexture(goCornerTexture, "incl/images/start.jpg") ||
+        !loadTexture(jailTexture, "incl/images/jail.jpg") ||
+        !loadTexture(parkingTexture, "incl/images/park.jpg") ||
+        !loadTexture(goToJailTexture, "incl/images/gtjail.jpg"))
     {
         std::cerr << "FATAL: Failed to load one or more essential textures. Exiting." << std::endl;
         exit(1); // Exit if textures can't be loaded

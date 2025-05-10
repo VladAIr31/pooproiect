@@ -7,10 +7,10 @@
 #include <iostream>
 #include "Prices.h"
 
-class hotel : public prices {
+class Hotel : public Prices {
 
 public:
-    hotel() : prices(500, 200) {}
+    Hotel() : Prices(500, 200) {}
 
     void print(std::ostream &os) const override {
         os << "Hotel: " << get_price() << ' ' << get_sell_price();

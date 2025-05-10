@@ -8,13 +8,13 @@
 #include <string>
 #include "Prices.h"
 
-class player;
+class Player;
 
-class motel : public prices {
+class Motel : public Prices {
     std::string name;
 
 public:
-    motel(const std::string &name, int price);
+    Motel(const std::string &name, int price);
 
     void print(std::ostream &os) const override {
         os << "Motel: " << name << " (Pret: " << get_price()
@@ -22,10 +22,10 @@ public:
 
     }
 
-    int calculateRent(const player& owner) const override;
+    int calculateRent(const Player& owner) const override;
 
-    prices* clone() const override {
-        return new motel(*this);
+    Prices* clone() const override {
+        return new Motel(*this);
     }
 };
 

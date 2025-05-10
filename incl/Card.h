@@ -5,17 +5,17 @@
 #ifndef CARD_H
 #define CARD_H
 #include <iostream>
-class card {
+class Card {
     std::string type;
     std::string use;
 public:
-    card(const std::string &type,  const std::string &use) :
+    Card(const std::string &type,  const std::string &use) :
     type(type), use(use) {}
-    friend std::ostream &operator<<(std::ostream &os, const card &c) {
+    friend std::ostream &operator<<(std::ostream &os, const Card &c) {
         os << c.type<<' '<<c.use;
         return os;
     }
-    bool operator==(const card &) const {
+    bool operator==(const Card &) const {
         return true;
     }
     const std::string& get_type() const  { return type; }

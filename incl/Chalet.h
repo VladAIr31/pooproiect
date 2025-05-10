@@ -8,24 +8,24 @@
 #include <string>
 #include "Prices.h" // Include clasa de bază
 
-class player;
+class Player;
 
-class chalet : public prices {
+class Chalet : public Prices {
     std::string name;
 
 public:
-    chalet(const std::string &name, int price);
+    Chalet(const std::string &name, int price);
 
     void print(std::ostream &os) const override {
-        os << "Cabana: " << name << " (Pret: " << get_price()
-           << ", Ipoteca: " << get_sell_price() << ")";
+        os << "Chalet: " << name << " (Price: " << get_price()
+           << ", Mortgage: " << get_sell_price() << ")";
 
     }
 
-    int calculateRent(const player& owner) const override;
+    int calculateRent(const Player& owner) const override;
 
-    prices* clone() const override {
-        return new chalet(*this);
+    Prices* clone() const override {
+        return new Chalet(*this);
     }
 };
 

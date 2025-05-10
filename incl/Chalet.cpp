@@ -1,18 +1,18 @@
 //
 // Created by vladg on 5/5/2025.
 //
-#include "Chalet.h" // Include headerul propriei clase
-#include "player.h" // Include headerul necesar pentru implementarea calculateRent
+#include "Chalet.h"
+#include "Player.h"
 #include <iostream>
 #include<algorithm>
 
-chalet::chalet(const std::string &name, int price)
-    : prices(price, price / 2), name(name) {}
+Chalet::Chalet(const std::string &name, int price)
+    : Prices(price, price / 2), name(name) {}
 
-int chalet::calculateRent(const player& owner) const {
+int Chalet::calculateRent(const Player& owner) const {
 
 
-    int owned_count = owner.countOwnedChalets(); // Apelăm metoda din player
+    int owned_count = owner.countOwnedChalets();
     switch (owned_count) {
         case 1: return 25;
         case 2: return 50;

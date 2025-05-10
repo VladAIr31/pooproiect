@@ -6,13 +6,13 @@
 #include <iostream>
 #include<algorithm>
 
-motel::motel(const std::string &name, int price)
-    : prices(price, price / 2), name(name) {}
+Motel::Motel(const std::string &name, int price)
+    : Prices(price, price / 2), name(name) {}
 
-int motel::calculateRent(const player& owner) const {
+int motel::calculateRent(const Player& owner) const {
 
 
-    int owned_count = owner.countOwnnedMotels(); // Apelăm metoda din player
+    int owned_count = owner.countOwnnedMotels();
     switch (owned_count) {
         case 1: return 100;
         case 2: return 200;
