@@ -88,7 +88,7 @@ if (Player::isPlayerNameValid(potentialName)) {
 }
 
 
-// Number of active players at the end of main (before return):
+// Number of active players at the end of main (before return)
 std::cout << "Number of active players at the end of main (before return): " << Player::getActivePlayers() << std::endl;
 
 
