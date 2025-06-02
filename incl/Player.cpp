@@ -97,7 +97,7 @@ int Player::countOwnedChalets() const {
             return p && dynamic_cast<Chalet*>(p.get()) != nullptr;
         });
 }
-int Player::countOwnnedMotels() const {
+int Player::countOwnedMotels() const {
     return std::count_if(ownership.begin(), ownership.end(),
         [](const std::unique_ptr<Prices>& p) {
             return p && dynamic_cast<Motel*>(p.get()) != nullptr;

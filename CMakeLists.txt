@@ -57,6 +57,8 @@ add_executable(${PROJECT_NAME}
     main.cpp
     generated/src/Helper.cpp
     env_fixes.h
+        incl/PropertyFactory.cpp
+
         ${SOURCE_FILES_INCL}
         ${INCLUDE_FILES}
 

@@ -1,8 +1,8 @@
-/
+
 // Created by vladg on 5/5/2025.
 //
-#include "Motel.h" // Corrected casing
-#include "Player.h" // Corrected casing
+#include "Motel.h"
+#include "Player.h"
 #include <iostream>
 #include <algorithm>
 
@@ -10,7 +10,7 @@ Motel::Motel(const std::string &name, int price)
     : Prices(price, price / 2), name(name) {}
 
 int Motel::calculateRent(const Player& owner) const {
-    int owned_count = owner.countOwnedMotels()
+    int owned_count = owner.countOwnedMotels();
     switch (owned_count) {
         case 1: return 100;
         case 2: return 200;
