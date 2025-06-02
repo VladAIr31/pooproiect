@@ -112,7 +112,7 @@ std::cout << "Number of active players at the end of main (before return): " << 
 
 
     } catch (const std::exception& e) {
-        std::cerr << "Error during property creation or adding: " << e.what() << std::endl;
+        std::cerr << "Error during property creation or adding: " << e.what() << '\n';
     }
 
 
