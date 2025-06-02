@@ -11,6 +11,10 @@
 #include "incl/Prices.h"
 #include "incl/Exception.h"
 #include "incl/PropertyFactory.h"
+#include "incl/Deck.h"            // Include the Deck template class
+#include "incl/Myfind.h"           // Include the template function
+#include "incl/Observer.h"        // For Observer/Subject
+#include "incl/Dice.h"
 
 int main() {
 sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Monopoly Style Board - Single CPP");
@@ -113,6 +117,85 @@ std::cout << "Number of active players at the end of main (before return): " << 
 
     } catch (const std::exception& e) {
         std::cerr << "Error during property creation or adding: " << e.what() << '\n';
+    }
+
+    // --- Observer Pattern Demonstration ---
+    Player p2("Bob", Pawn("Blue", {0, 0}), 1500);
+    std::cout << "\n--- Observer Pattern Demonstration ---" << std::endl;
+    Dice gameDice;
+    gameDice.attach(&p1); // Vlad observes the dice
+    gameDice.attach(&p2); // Bob observes the dice
+
+    std::cout << "\nRolling dice..." << std::endl;
+    gameDice.roll();
+
+    std::cout << "\nBob stops observing." << std::endl;
+    gameDice.detach(&p2);
+
+    std::cout << "\nRolling dice again..." << std::endl;
+    gameDice.roll();
+
+
+    // --- Deck Template Class Demonstration ---
+    std::cout << "\n--- Deck Template Class Demonstration ---" << std::endl;
+    // Instantiation 1: Deck of Cards
+    Deck<Card> chanceDeck;
+    chanceDeck.addCard(Card("Chance", "Advance to Go (Collect $200)"));
+    chanceDeck.addCard(Card("Chance", "Bank error in your favor. Collect $75"));
+    chanceDeck.addCard(Card("Chance", "Go to Jail. Go directly to Jail."));
+    std::cout << "Original Chance Deck:\n" << chanceDeck;
+    chanceDeck.shuffle();
+    std::cout << "\nShuffled Chance Deck:\n" << chanceDeck;
+    try {
+        Card drawnChanceCard = chanceDeck.drawCard();
+        std::cout << "Drawn Chance Card: " << drawnChanceCard << std::endl;
+    } catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    // Instantiation 2: Deck of Integers (e.g., for Community Chest amounts)
+    Deck<int> communityChestValues;
+    communityChestValues.addCard(100); // Collect $100
+    communityChestValues.addCard(-50); // Pay $50
+    communityChestValues.addCard(20);  // Collect $20
+    std::cout << "\nOriginal Community Chest Values Deck:\n" << communityChestValues;
+    communityChestValues.shuffle();
+    std::cout << "\nShuffled Community Chest Values Deck:\n" << communityChestValues;
+    try {
+        int drawnValue = communityChestValues.drawCard();
+        std::cout << "Drawn Community Chest Value: $" << drawnValue << std::endl;
+    } catch (const std::out_of_range& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+
+    // --- Template Function Demonstration (`findInCollection`) ---
+    std::cout << "\n--- Template Function Demonstration ---" << std::endl;
+    std::vector<Player> playerList;
+    playerList.push_back(p1);
+    playerList.push_back(p2);
+    playerList.push_back(Player("Charlie", Pawn("Green", {0,0}), 800));
+
+    // Instantiation 1: Find player by name
+    std::string nameToFind = "Bob";
+    auto foundPlayerByName = findInCollection(playerList,
+        [&nameToFind](const Player& p){ return p.getName() == nameToFind; });
+
+    if (foundPlayerByName) {
+        std::cout << "Found player by name '" << nameToFind << "': " << foundPlayerByName->getName() << " with budget $" << foundPlayerByName->getBuget() << std::endl;
+    } else {
+        std::cout << "Player with name '" << nameToFind << "' not found." << std::endl;
+    }
+
+    // Instantiation 2: Find player with budget less than 1000
+    int budgetThreshold = 1000;
+    auto foundPlayerByBudget = findInCollection(playerList,
+        [budgetThreshold](const Player& p){ return p.getBuget() < budgetThreshold; });
+
+    if (foundPlayerByBudget) {
+        std::cout << "Found player with budget < $" << budgetThreshold << ": " << foundPlayerByBudget->getName() << " with budget $" << foundPlayerByBudget->getBuget() << std::endl;
+    } else {
+        std::cout << "No player found with budget < $" << budgetThreshold << "." << std::endl;
     }
 
 

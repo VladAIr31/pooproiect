@@ -6,7 +6,7 @@
 
 #include "Exception.h"
 #include "Chalet.h"
-#include "motel.h"
+#include "Motel.h"
 
 int Player::activePlayers = 0;
 

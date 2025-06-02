@@ -8,14 +8,13 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-
-
+#include "Observer.h"
 #include "Card.h"
 #include "Pawn.h"
 #include "Prices.h"
 
 
-class Player {
+class Player : public Observer  {
 private:
     std::string name;
     Pawn p;
@@ -61,6 +60,9 @@ public:
 
     static int getActivePlayers();
     static  bool isPlayerNameValid(const std::string& name);
+    void update(const std::string& eventMessage) override {
+        std::cout << "Player " << name << " received event: " << eventMessage << std::endl;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Player& pa);
 };
