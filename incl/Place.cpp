@@ -1,10 +1,10 @@
 //
 // Created by vladg on 6/2/2025.
 //
-include "Place.h" // Include the corresponding header file
+#include "Places.h" // Include the corresponding header file
 
 // Constructor definition
-Place::Place(const std::string &name, const std::string &color, int price, int base_rent, int rent_hotel)
+Places::Places(const std::string &name, const std::string &color, int price, int base_rent, int rent_hotel)
     : Prices(price, price / 2), // Initialize base class Prices with price and mortgage value (price / 2)
       name(name),
       color_group(color),
@@ -18,7 +18,7 @@ Place::Place(const std::string &name, const std::string &color, int price, int b
 {}
 
 // print method definition
-void Place::print(std::ostream &os) const {
+void Places::print(std::ostream &os) const {
     os << "Location [" << color_group << "]: " << name << " (Price: " << get_price() << ", mortgage: " << get_sell_price() << ")";
     if (nr_houses == 0) {
         os << " - No houses";
@@ -30,7 +30,7 @@ void Place::print(std::ostream &os) const {
 }
 
 // calculateRent method definition
-int Place::calculateRent(const Player& owner) const {
+int Places::calculateRent(const Player& owner) const {
 
     bool has_color = false; // Placeholder: This logic needs to be implemented based on game rules
 
@@ -52,17 +52,17 @@ int Place::calculateRent(const Player& owner) const {
 }
 
 // clone method definition for deep copying
-Prices* Place::clone() const {
-    return new Place(*this); // Returns a new dynamically allocated Place object, copied from *this
+Prices* Places::clone() const {
+    return new Places(*this); // Returns a new dynamically allocated Place object, copied from *this
 }
 
 // getBuildingCost method definition
-int Place::getBuildingCost() const {
+int Places::getBuildingCost() const {
     return 50; // Fixed cost for building a house/hotel
 }
 
 // addHouseHotel method definition
-bool Place::addHouseHotel() {
+bool Places::addHouseHotel() {
     if (nr_houses < 5) { // Max 4 houses -> 1 hotel (5 houses means it's a hotel)
         nr_houses++;
         std::cout << "Build on " << name << ". Current level: " << (nr_houses == 5 ? "Hotel" : std::to_string(nr_houses) + " houses") << std::endl;
@@ -73,7 +73,7 @@ bool Place::addHouseHotel() {
 }
 
 // sellHouseHotel method definition
-bool Place::sellHouseHotel() {
+bool Places::sellHouseHotel() {
     if (nr_houses > 0) {
         nr_houses--;
         int refund = getBuildingCost() / 2; // Refund half the building cost
@@ -87,16 +87,16 @@ bool Place::sellHouseHotel() {
 }
 
 // getNrHouses getter definition
-int Place::getNrHouses() const {
+int Places::getNrHouses() const {
     return nr_houses;
 }
 
 // getColorGroup getter definition
-const std::string& Place::getColorGroup() const {
+const std::string& Places::getColorGroup() const {
     return color_group;
 }
 
 // operator== overload definition
-bool Place::operator==(const Place &other) const {
+bool Places::operator==(const Places &other) const {
     return name == other.name && color_group == other.color_group;
 }

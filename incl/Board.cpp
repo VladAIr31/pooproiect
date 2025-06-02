@@ -9,11 +9,11 @@
 // Constructor Implementation
 GameBoard::GameBoard() : gridLines(sf::Lines) {
     // Load textures first
-    if (!loadTexture(houseTexture, "incl/images/cabana.jpg") ||
-        !loadTexture(goCornerTexture, "incl/images/start.jpg") ||
-        !loadTexture(jailTexture, "incl/images/jail.jpg") ||
-        !loadTexture(parkingTexture, "incl/images/park.jpg") ||
-        !loadTexture(goToJailTexture, "incl/images/gtjail.jpg"))
+    if (!loadTexture(houseTexture, "images/cabana.jpg") ||
+        !loadTexture(goCornerTexture, "images/start.jpg") ||
+        !loadTexture(jailTexture, "images/jail.jpg") ||
+        !loadTexture(parkingTexture, "images/park.jpg") ||
+        !loadTexture(goToJailTexture, "images/gtjail.jpg"))
     {
         std::cerr << "FATAL: Failed to load one or more essential textures. Exiting." << std::endl;
         exit(1); // Exit if textures can't be loaded

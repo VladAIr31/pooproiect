@@ -1,4 +1,4 @@
-/ Place.h
+
 #ifndef PLACES_H
 #define PLACES_H
 
@@ -9,7 +9,7 @@
 
 
 
-class Place : public Prices {
+class Places : public Prices {
 private:
     std::string name;
     std::string color_group;
@@ -20,7 +20,7 @@ private:
 
 public:
     // Constructor declaration
-    Place(const std::string &name, const std::string &color, int price, int base_rent, int rent_hotel);
+    Places(const std::string &name, const std::string &color, int price, int base_rent, int rent_hotel);
 
     // Override methods from Prices
     void print(std::ostream &os) const override;
@@ -37,7 +37,7 @@ public:
     const std::string& getColorGroup() const;
 
     // Operator overload
-    bool operator==(const Place &other) const;
+    bool operator==(const Places &other) const;
 };
 
 #endif // PLACES_H

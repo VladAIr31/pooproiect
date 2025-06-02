@@ -10,6 +10,7 @@
 #include "incl/Boardconf.h"
 #include "incl/Prices.h"
 #include "incl/Exception.h"
+#include "incl/PropertyFactory.h"
 
 int main() {
 sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Monopoly Style Board - Single CPP");
@@ -91,7 +92,28 @@ if (Player::isPlayerNameValid(potentialName)) {
 // Number of active players at the end of main (before return)
 std::cout << "Number of active players at the end of main (before return): " << Player::getActivePlayers() << std::endl;
 
+    //PropertyFactory Demonstration
+    std::cout << "--- PropertyFactory Demonstration ---" << std::endl;
+    Pawn p1_pawn("Red", {0, 0});
+    Player p1("Vlad", p1_pawn, 2000);
 
+    try {
+        auto chalet1 = PropertyFactory::createChalet("Paltinis Chalet", 220);
+        p1.add_property(std::move(chalet1));
+
+        auto motel1 = PropertyFactory::createMotel("Crossroads Motel", 180);
+        p1.add_property(std::move(motel1));
+
+        auto bucharestPlace = PropertyFactory::createPlace("Bucharest - Calea Victoriei", "DarkBlue", 400, 50, 2000);
+        p1.add_property(std::move(bucharestPlace));
+
+
+
+
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error during property creation or adding: " << e.what() << std::endl;
+    }
 
 
 

@@ -8,6 +8,7 @@
 #include <string>
 #include "Prices.h"
 
+
 class Player;
 
 class Motel : public Prices {
@@ -17,8 +18,8 @@ public:
     Motel(const std::string &name, int price);
 
     void print(std::ostream &os) const override {
-        os << "Motel: " << name << " (Pret: " << get_price()
-           << ", Ipoteca: " << get_sell_price() << ")";
+        os << "Motel: " << name << " (Price: " << get_price()
+           << ", Mortgage: " << get_sell_price() << ")";
 
     }
 
