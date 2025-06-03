@@ -7,7 +7,7 @@
 #include "Observer.h" // For Subject
 #include <random>
 #include <string>
-#include <vector> // Include for std::vector
+#include <vector> 
 
 class Dice : public Subject {
 private:
